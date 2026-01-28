@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pro EMI Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body class="bg-slate-50 font-sans">
+    <div class="container py-10">
+      <header class="text-center mb-10">
+        <h1 class="text-4xl font-extrabold text-slate-800">EMI Calculator</h1>
+        <p class="text-slate-500">
+          Plan your loans with precision and visual insights
+        </p>
+      </header>
+
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <div
+            class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100"
+          >
+            <h3 class="text-lg font-bold mb-4 text-slate-700">Loan Details</h3>
+
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-slate-600 mb-1"
+                >Loan Amount ($)</label
+              >
+              <input
+                type="number"
+                id="amount"
+                value="50000"
+                class="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition"
+              />
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-slate-600 mb-1"
+                >Interest Rate (% P.A)</label
+              >
+              <input
+                type="number"
+                id="rate"
+                value="8.5"
+                step="0.1"
+                class="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition"
+              />
+            </div>
+
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-slate-600 mb-1"
+                >Tenure (Years)</label
+              >
+              <input
+                type="number"
+                id="tenure"
+                value="5"
+                class="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition"
+              />
+            </div>
+
+            <button
+              onclick="calculateEMI()"
+              class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg transition-all shadow-lg shadow-indigo-200"
+            >
+              Calculate Now
+            </button>
+          </div>
+        </div>
+
+        <div class="col-lg-8">
+          <div
+            class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 h-full"
+          >
+            <div class="row text-center mb-8">
+              <div class="col-md-4">
+                <p class="text-slate-500 text-sm">Monthly EMI</p>
+                <h2 id="emi-display" class="text-3xl font-bold text-indigo-600">
+                  $0
+                </h2>
+              </div>
+              <div class="col-md-4 border-start border-end">
+                <p class="text-slate-500 text-sm">Total Interest</p>
+                <h2
+                  id="interest-display"
+                  class="text-3xl font-bold text-rose-500"
+                >
+                  $0
+                </h2>
+              </div>
+              <div class="col-md-4">
+                <p class="text-slate-500 text-sm">Total Payable</p>
+                <h2
+                  id="total-display"
+                  class="text-3xl font-bold text-slate-800"
+                >
+                  $0
+                </h2>
+              </div>
+            </div>
+
+            <div class="flex justify-center">
+              <div style="width: 300px; height: 300px">
+                <canvas id="emiChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+<!-- 
+      <div
+        class="mt-10 bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden"
+      >
+        <div class="p-6 border-b border-slate-100">
+          <h3 class="text-lg font-bold text-slate-700">
+            Amortization Schedule (Yearly)
+          </h3>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="bg-slate-50">
+              <tr>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase"
+                >
+                  Year
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase"
+                >
+                  Principal Paid
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase"
+                >
+                  Interest Paid
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase"
+                >
+                  Remaining Balance
+                </th>
+              </tr>
+            </thead>
+            <tbody id="schedule-body" class="text-sm text-slate-600"></tbody>
+          </table> -->
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let myChart;
+
+      function calculateEMI() {
+        const P = parseFloat(document.getElementById("amount").value);
+        const R = parseFloat(document.getElementById("rate").value) / 12 / 100;
+        const N = parseFloat(document.getElementById("tenure").value) * 12;
+        const emi = (P * R * Math.pow(1 + R, N)) / (Math.pow(1 + R, N) - 1);
+        const totalPayable = emi * N;
+        const totalInterest = totalPayable - P;
+        document.getElementById("emi-display").innerText =
+          "$" + emi.toLocaleString(undefined, { maximumFractionDigits: 2 });
+        document.getElementById("interest-display").innerText =
+          "$" +
+          totalInterest.toLocaleString(undefined, { maximumFractionDigits: 2 });
+        document.getElementById("total-display").innerText =
+          "$" +
+          totalPayable.toLocaleString(undefined, { maximumFractionDigits: 2 });
+
+        updateChart(P, totalInterest);
+        generateSchedule(P, R, emi, N);
+      }
+
+      function updateChart(principal, interest) {
+        const ctx = document.getElementById("emiChart").getContext("2d");
+
+        if (myChart) {
+          myChart.destroy();
+        }
+
+        myChart = new Chart(ctx, {
+          type: "doughnut",
+          data: {
+            labels: ["Principal", "Interest"],
+            datasets: [
+              {
+                data: [principal, interest],
+                backgroundColor: ["#4f46e5", "#f43f5e"],
+                hoverOffset: 4,
+              },
+            ],
+          },
+          options: {
+            plugins: {
+              legend: { position: "bottom" },
+            },
+          },
+        });
+      }
+
+      function generateSchedule(P, R, emi, N) {
+        const body = document.getElementById("schedule-body");
+        body.innerHTML = "";
+        let balance = P;
+        let yearlyPrincipal = 0;
+        let yearlyInterest = 0;
+
+        for (let i = 1; i <= N; i++) {
+          let interestPadding = balance * R;
+          let principalPadding = emi - interestPadding;
+          balance -= principalPadding;
+
+          yearlyPrincipal += principalPadding;
+          yearlyInterest += interestPadding;
+          if (i % 12 === 0 || i === N) {
+            const row = `
+                    <tr class="border-b border-slate-50">
+                        <td class="px-6 py-4 font-medium text-slate-900">${Math.ceil(i / 12)}</td>
+                        <td class="px-6 py-4 text-emerald-600">+$${yearlyPrincipal.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                        <td class="px-6 py-4 text-rose-500">-$${yearlyInterest.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                        <td class="px-6 py-4 font-bold text-slate-700">$${Math.max(0, balance).toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                    </tr>
+                `;
+            body.innerHTML += row;
+            yearlyPrincipal = 0;
+            yearlyInterest = 0;
+          }
+        }
+      }
+      window.onload = calculateEMI;
+    </script>
+  </body>
+</html>
